@@ -1,0 +1,32 @@
+model_config:
+#  model_name: 'Native_Bayes_Bernoulli'
+#  model_parameter:
+
+#  model_name: 'Native_Bayes_Categorical'
+#  model_parameter:
+#    min_categories: 2
+
+#  model_name: 'Native_Bayes_Complement'
+#  model_parameter:
+
+#  model_name: 'Native_Bayes_Gaussian'
+#  model_parameter:
+
+  model_name: 'Native_Bayes_Multinomial'
+  model_parameter:
+
+data_config:
+  train_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_train_data.txt'
+  test_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_test_data.txt'
+  # text representation type: one-hot, bag of words, tf-idf, word2vec, glove, embedding
+  text_representation: 'one-hot'
+  # text granularity: 1-gram(char), 2-gram, 3-gram, jieba_segment, hanlp_segment, sentence
+  granularity: 'jieba_segment'
+  vocabulary: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/segment_vocab.txt'
+
+train_config:
+  epoch: 32
+  batch_size: 32
+  learning_rate: 1e-3
+
+stop_word_file: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/stop_words.txt'
