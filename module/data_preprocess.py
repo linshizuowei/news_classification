@@ -85,7 +85,11 @@ class StopWordDeleter(object):
 class TextPresenter(object):
     def __init__(self, config):
         self.present_type = config.get('data_config').get('text_representation')
-        vocabulary_file = config.get('data_config').get('vocabulary')
+        vocabulary_pre = config.get('data_config').get('vocabulary_pre')
+        vocabulary_file = os.path.join(vocabulary_pre, config['data_config']['granularity'] + '_vocab.txt')
+        if not os.path.exists(vocabulary_file):
+            from .util import build_vocabulary
+            build_vocabulary(vocabulary_file)
         self.vocab_dict = {}
         # word id start from 3, for 0,1,2 reprenting start token, end token and unknown token respectively
         with open(vocabulary_file) as fd:

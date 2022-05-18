@@ -4,9 +4,7 @@ import json
 import random
 import yaml
 
-from module.data_preprocess import Tokenizer
 from module.train import main
-
 
 def split_and_reformat():
     """
@@ -14,8 +12,8 @@ def split_and_reformat():
     1. split train data file and test data file
     2. reformat data file to standard format: label\tdata\n
     """
-    test_cnt = 10000
-    sample_extract = 100000
+    test_cnt = 100
+    sample_extract = 1000
 
     # tou tiao dataset
     # dataset format:
@@ -44,39 +42,6 @@ def split_and_reformat():
         print('=====> %s train data saved done' % (len(dataset)-test_cnt))
 
 
-def build_vocabulary():
-    conf_file = '/Users/dianxiaonao/Work/NLP_work/news_classification/config.yaml'
-    with open(conf_file, encoding='utf-8') as fd:
-        config = yaml.load(fd, Loader=yaml.FullLoader)
-    tokenizer = Tokenizer(config)
-
-    train_data = []
-    with open(config['data_config']['train_data']) as fd:
-        for line in fd:
-            train_data.append('\t'.join(line.strip().split('\t')[1:]))
-    train_data = tokenizer.tokenize(train_data)
-
-    test_data = []
-    with open(config['data_config']['test_data']) as fd:
-        for line in fd:
-            test_data.append('\t'.join(line.strip().split('\t')[1:]))
-    test_data = tokenizer.tokenize(test_data)
-
-    vocab_file = config['data_config']['vocabulary']
-    visited = set()
-    with open(vocab_file, 'w') as out:
-        out.write('CLS\nSEP\nUNK\n')
-        cnt = 3
-        for dset in [train_data, test_data]:
-            for item in dset:
-                for w in item:
-                    w = w.strip()
-                    if w and w not in visited:
-                        cnt += 1
-                        out.write(w + '\n')
-                        visited.add(w)
-    print('====>>> done, word count: ', cnt)
-
 def labelmap():
     data_file = '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_cat_data.txt'
     lm_file = '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_label2id.txt'
@@ -95,5 +60,4 @@ def labelmap():
 if __name__ == '__main__':
     # labelmap()
     # split_and_reformat()
-    # build_vocabulary()
     main('/Users/dianxiaonao/Work/NLP_work/news_classification/config.yaml')

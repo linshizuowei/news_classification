@@ -12,17 +12,30 @@ model_config:
 #  model_name: 'Native_Bayes_Gaussian'
 #  model_parameter:
 
-  model_name: 'Native_Bayes_Multinomial'
+#  model_name: 'Native_Bayes_Multinomial'
+#  model_parameter:
+
+#  model_name: 'KNN'
+#  model_parameter:
+#    n_neighbors: 5
+#    # weights: {‘uniform’, ‘distance’}, uniform: 训练点等权, distance: 根据距离加权
+#    weights: 'uniform'
+
+#  model_name: 'svm'
+#  model_parameter:
+
+  model_name: 'gbdt'
   model_parameter:
+    n_estimators: 30
 
 data_config:
   train_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_train_data.txt'
   test_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_test_data.txt'
-  # text representation type: one-hot, bag of words, tf-idf, word2vec, glove, embedding
-  text_representation: 'one-hot'
+  # text representation type: one-hot, bow(bag of words), tf-idf, word2vec, glove, embedding
+  text_representation: 'bow'
   # text granularity: 1-gram(char), 2-gram, 3-gram, jieba_segment, hanlp_segment, sentence
   granularity: 'jieba_segment'
-  vocabulary: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/segment_vocab.txt'
+  vocabulary_pre: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/'
 
 train_config:
   epoch: 32
