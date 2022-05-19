@@ -24,9 +24,14 @@ model_config:
 #  model_name: 'svm'
 #  model_parameter:
 
-  model_name: 'gbdt'
+#  model_name: 'gbdt'
+#  model_parameter:
+#    n_estimators: 30
+
+  model_name: 'xgboost'
   model_parameter:
-    n_estimators: 30
+    max_depth: 2
+    nthread: 2
 
 data_config:
   train_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_train_data.txt'
@@ -43,3 +48,4 @@ train_config:
   learning_rate: 1e-3
 
 stop_word_file: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/stop_words.txt'
+label2id_file: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_label2id.txt'

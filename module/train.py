@@ -10,6 +10,7 @@ from sklearn.svm import LinearSVC
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import multilabel_confusion_matrix, classification_report
 
+from .models import Xgboost
 from .data_preprocess import Tokenizer
 from .data_preprocess import StopWordDeleter
 from .data_preprocess import TextPresenter
@@ -48,6 +49,11 @@ def model_evaluate(model, config):
     test_label, test_data = build_dataset(config, train=False)
     predict_ret = model.predict(test_data)
     predict_ret = predict_ret.tolist()
+
+    if config['model_config']['model_name'] == 'xgboost':
+        with open(config['label2id_file']) as fd:
+            id2l = {int(line.split()[1]): line.split()[0] for line in fd}
+            predict_ret = [id2l[int(it)] for it in predict_ret]
 
     # cmat = multilabel_confusion_matrix(test_label, predict_ret)
     # print('=====>> confusion matrix:')
@@ -92,6 +98,9 @@ def train_model(config, dataset):
         param = config['model_config'].get('model_parameter')
         estimators = param.get('n_estimators')
         model = GradientBoostingClassifier(n_estimators=estimators)
+        model.fit(data, label)
+    elif model_name == 'xgboost':
+        model = Xgboost(config)
         model.fit(data, label)
 
     model_evaluate(model, config)
