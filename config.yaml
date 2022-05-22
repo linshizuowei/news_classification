@@ -34,6 +34,7 @@ model_config:
     nthread: 2
 
 data_config:
+  origin_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_cat_data.txt'
   train_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_train_data.txt'
   test_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_test_data.txt'
   # text representation type: one-hot, bow(bag of words), tf-idf, word2vec, glove, embedding
@@ -49,3 +50,4 @@ train_config:
 
 stop_word_file: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/stop_words.txt'
 label2id_file: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_label2id.txt'
+is_classification: True

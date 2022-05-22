@@ -48,12 +48,13 @@ def build_dataset(config, train=True):
 def model_evaluate(model, config):
     test_label, test_data = build_dataset(config, train=False)
     predict_ret = model.predict(test_data)
-    predict_ret = predict_ret.tolist()
+    predict_ret = [int(p) for p in predict_ret.tolist()]
 
     if config['model_config']['model_name'] == 'xgboost':
-        with open(config['label2id_file']) as fd:
-            id2l = {int(line.split()[1]): line.split()[0] for line in fd}
-            predict_ret = [id2l[int(it)] for it in predict_ret]
+        # with open(config['label2id_file']) as fd:
+        #     id2l = {int(line.split()[1]): line.split()[0] for line in fd}
+        #     predict_ret = [id2l[int(it)] for it in predict_ret]
+        test_label = model.label_encoder.transform(test_label)
 
     # cmat = multilabel_confusion_matrix(test_label, predict_ret)
     # print('=====>> confusion matrix:')
