@@ -88,8 +88,10 @@ class TextPresenter(object):
         vocabulary_pre = config.get('data_config').get('vocabulary_pre')
         vocabulary_file = os.path.join(vocabulary_pre, config['data_config']['granularity'] + '_vocab.txt')
         if not os.path.exists(vocabulary_file):
+            print('=====>>>vocabulary file not exists, build vocab now')
             from .util import build_vocabulary
             build_vocabulary(vocabulary_file)
+            print('=====>>>build vocabulary finished')
         self.vocab_dict = {}
         # word id start from 3, for 0,1,2 reprenting start token, end token and unknown token respectively
         with open(vocabulary_file) as fd:
