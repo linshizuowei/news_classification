@@ -24,14 +24,14 @@ model_config:
 #  model_name: 'svm'
 #  model_parameter:
 
-#  model_name: 'gbdt'
-#  model_parameter:
-#    n_estimators: 30
-
-  model_name: 'xgboost'
+  model_name: 'gbdt'
   model_parameter:
-    max_depth: 2
-    nthread: 2
+    n_estimators: 30
+
+#  model_name: 'xgboost'
+#  model_parameter:
+#    max_depth: 2
+#    nthread: 2
 
 data_config:
   origin_data: '/Users/dianxiaonao/Work/NLP_work/news_classification/dataset/toutiao_cat_data.txt'

@@ -10,7 +10,7 @@ from sklearn.svm import LinearSVC
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import multilabel_confusion_matrix, classification_report
 
-from .models import Xgboost
+from ..models.xgboost import Xgboost
 from .data_preprocess import Tokenizer
 from .data_preprocess import StopWordDeleter
 from .data_preprocess import TextPresenter
