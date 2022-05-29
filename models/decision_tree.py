@@ -109,7 +109,36 @@ class DecisionTree(object):
 
         """
 
+        # calculate entropy of samples
+        entropy = self.cal_entropy(label)
 
+        # calculate conditional entropy of features
+        features_con_entropy = {}
+        for fea in self.feature_map:
+            con_entropy = self.cal_con_entropy(data[:, fea], label)
+            features_con_entropy[fea] = con_entropy
+
+        # select feature of max Gain(D, a)
+        max_gain = float('-inf')
+        selected_feature = None
+        for fea in self.feature_map:
+            gain = entropy - features_con_entropy[fea]
+            if gain > max_gain:
+                selected_feature = fea
+
+        return selected_feature
+
+    def cal_entropy(self, samples):
+        """
+
+        Args:
+            samples:
+
+        Returns:
+
+        """
+
+        
 
     def initialize_feature_map(self, data):
         """
