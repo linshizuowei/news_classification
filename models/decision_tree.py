@@ -1,6 +1,9 @@
 import os
 import sys
 import numpy as np
+import math
+
+from collections import Counter
 
 
 class TreeNode(object):
@@ -90,11 +93,10 @@ class DecisionTree(object):
         # build tree recursively
         for child in parent_node.children:
             child_node = parent_node.children[child]
-            child_index = np.squeeze(np.argwhere(data[:, feature_name]==child))
+            child_index = np.squeeze(np.argwhere(data[:, feature_name] == child))
             child_data = data[child_index]
             child_label = label[child_index]
             self.build_tree(child_node, child_data, child_label)
-
 
     def search_split_feature(self, data, label):
         """
@@ -138,7 +140,55 @@ class DecisionTree(object):
 
         """
 
-        
+        assert len(samples.shape) == 1
+        cnt_dict = Counter(samples)
+        total = samples.shape[0]
+        entropy = 0.
+        for k in cnt_dict:
+            prob_k = cnt_dict[k] / total
+            entropy += (prob_k * math.log2(prob_k))
+        return entropy * -1
+
+    def cal_con_entropy(self, feature, label):
+        """
+
+        Args:
+            feature:
+            label:
+
+        Returns:
+
+        """
+
+        assert len(feature.shape) == 1
+        sample_cnt = feature.shape[0]
+        value_cnt = Counter(feature)
+        conditional_ent = 0
+        for val, cnt in value_cnt.items():
+            ind = np.argwhere(feature == val)
+            sub_label = label[ind]
+            sub_entropy = self.cal_entropy(sub_label)
+            conditional_ent += cnt / sample_cnt * sub_entropy
+        return conditional_ent
+
+    def cal_IV(self, feature, label):
+        """
+
+        Args:
+            feature:
+            label:
+
+        Returns:
+
+        """
+
+        assert len(feature.shape) == 1
+        sample_cnt = feature.shape[0]
+        value_cnt = Counter(feature)
+        feature_iv = 0.
+        for val, cnt in value_cnt.items():
+            feature_iv += cnt / sample_cnt * math.log2(cnt/sample_cnt)
+        return feature_iv * -1
 
     def initialize_feature_map(self, data):
         """
