@@ -273,3 +273,22 @@ class DecisionTreeC45(DecisionTree):
                 selected_feature = fea
 
         return selected_feature
+
+class DecisionTreeCART(DecisionTree):
+    """
+
+    """
+
+    def search_split_feature(self, data, label):
+        """
+
+        Args:
+            data:
+            label:
+
+        Returns:
+
+        """
+
+        pass
+    
