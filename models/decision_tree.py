@@ -7,9 +7,19 @@ from collections import Counter
 
 
 class TreeNode(object):
-    def __init__(self, val=None):
+    def __init__(self, val=None, feature=None):
         self.val = val
         self.children = {}
+        self.feature = feature
+        self.cls = None
+
+
+class CartTreeNode(object):
+    def __init__(self, val=None, feature=None):
+        self.val = val
+        self.left = None
+        self.right = None
+        self.feature = feature
         self.cls = None
 
 
@@ -54,7 +64,7 @@ class DecisionTree(object):
         # initialize tree node of feature values
         feature_vals = self.feature_map[feature_name]
         for val in feature_vals:
-            node = TreeNode(val)
+            node = TreeNode(val, feature_name)
             parent_node.children[val] = node
 
         # build tree recursively
@@ -274,10 +284,161 @@ class DecisionTreeC45(DecisionTree):
 
         return selected_feature
 
-class DecisionTreeCART(DecisionTree):
+
+class DecisionTreeCartCls(DecisionTree):
     """
 
     """
+
+    def build_tree(self, parent_node, data, label):
+        """
+
+        Args:
+            parent_node: CartTreeNode
+            data: np.ndarray, shape: [samples, features], train data set.
+            label: np.ndarray, shape: [samples,], label of train data.
+
+        Returns:
+
+        """
+
+        # stop split node or not
+        if len(set(label)) == 1:
+            parent_node.cls = set(label).pop()
+            return
+
+        # find split feature
+        feature_name, feature_value = self.search_split_feature(data, label)
+
+        # initialize tree node of feature values
+        lnode = CartTreeNode(feature_value, feature_name)
+        rnode = CartTreeNode(feature=feature_name)
+        parent_node.left = lnode
+        parent_node.right = rnode
+
+        # build tree left and right
+        lchild = parent_node.left
+        lindex = np.squeeze(np.argwhere(data[:, feature_name] == feature_value))
+        ldata = data[lindex]
+        llabel = label[lindex]
+        self.build_tree(lchild, ldata, llabel)
+        rchild = parent_node.right
+        rindex = np.squeeze(np.argwhere(data[:, feature_name] != feature_value))
+        rdata = data[rindex]
+        rlabel = label[rindex]
+        self.build_tree(rchild, rdata, rlabel)
+
+    def search_split_feature(self, data, label):
+        """
+        1. calculate gini index
+        2. find feature and value which minimum gini index
+
+        Args:
+            data:
+            label:
+
+        Returns:
+
+        """
+
+        selected_feature = None
+        selected_value = None
+        min_gini = float('inf')
+        for fea in self.feature_map:
+            values = self.feature_map[fea]
+            for val in values:
+                sub_gini = self.cal_feature_gini_index(data, label, fea, val)
+                if sub_gini < min_gini:
+                    selected_feature = fea
+                    selected_value = val
+                    min_gini = sub_gini
+
+        return selected_feature, selected_value
+
+    def cal_feature_gini_index(self, data, label, target_fea, target_val):
+        """
+
+        Args:
+            data:
+            label:
+            target_fea:
+            target_val:
+
+        Returns:
+
+        """
+
+        ind = np.squeeze(np.argwhere(data[:, target_fea] == target_val))
+        sub_label = label[ind]
+        target_gini = self.cal_gini_index(sub_label)
+        rest_ind = np.squeeze(np.argwhere(data[:, target_fea] != target_val))
+        rest_label = label[rest_ind]
+        rest_gini = self.cal_gini_index(rest_label)
+        gini_fea_val = sub_label.shape[0] / label.shape[0] * target_gini + rest_label.shape[0] / label.shape[0] * rest_gini
+
+        return gini_fea_val
+
+    def cal_gini_index(self, label):
+        """
+
+        Args:
+            label:
+
+        Returns:
+            gini:
+
+        """
+
+        total = label.shape[0]
+        cnt_dict = Counter(label)
+        gini = 1 - sum([math.pow(cnt / total, 2) for cnt in cnt_dict.values()])
+
+        return gini
+
+
+class DecisionTreeCartReg(DecisionTree):
+    """
+
+    """
+
+    def build_tree(self, parent_node, data, label):
+        """
+
+        Args:
+            parent_node: CartTreeNode
+            data: np.ndarray, shape: [samples, features], train data set.
+            label: np.ndarray, shape: [samples,], label of train data.
+
+        Returns:
+
+        """
+
+        # stop split node or not
+        if len(set(label)) == 1:
+            parent_node.cls = set(label).pop()
+            return
+
+        # find split feature
+        feature_name, feature_value = self.search_split_feature(data, label)
+
+        # initialize tree node of feature values
+        lnode = CartTreeNode(feature_value, feature_name)
+        rnode = CartTreeNode(feature=feature_name)
+        parent_node.left = lnode
+        parent_node.right = rnode
+
+        # build tree left and right
+        lchild = parent_node.left
+        lindex = np.squeeze(np.argwhere(data[:, feature_name] == feature_value))
+        ldata = data[lindex]
+        llabel = label[lindex]
+        self.build_tree(lchild, ldata, llabel)
+        rchild = parent_node.right
+        rindex = np.squeeze(np.argwhere(data[:, feature_name] != feature_value))
+        rdata = data[rindex]
+        rlabel = label[rindex]
+        self.build_tree(rchild, rdata, rlabel)
+
 
     def search_split_feature(self, data, label):
         """
@@ -290,5 +451,54 @@ class DecisionTreeCART(DecisionTree):
 
         """
 
-        pass
-    
+        selected_feature = None
+        selected_value = None
+        min_mse = float('inf')
+        for fea in self.feature_map:
+            values = self.feature_map[fea]
+            for val in values:
+                sub_mse = self.cal_feature_mse(data, label, fea, val)
+                if sub_mse < min_mse:
+                    selected_feature = fea
+                    selected_value = val
+                    min_mse = sub_mse
+
+        return selected_feature, selected_value
+
+    def cal_feature_mse(self, data, label, target_fea, target_val):
+        """
+
+        Args:
+            data:
+            label:
+            target_fea:
+            target_val:
+
+        Returns:
+
+        """
+
+        ind = np.squeeze(np.argwhere(data[:, target_fea] == target_val))
+        sub_label = label[ind]
+        target_mse = self.cal_mse(sub_label)
+        rest_ind = np.squeeze(np.argwhere(data[:, target_fea] != target_val))
+        rest_label = label[rest_ind]
+        rest_mse = self.cal_mse(rest_label)
+        mse_fea_val = sub_label.shape[0] / label.shape[0] * target_mse + rest_label.shape[0] / label.shape[
+            0] * rest_mse
+
+        return mse_fea_val
+
+    def cal_mse(self, label):
+        """
+
+        Args:
+            label:
+
+        Returns:
+
+        """
+
+        ypred = np.mean(label)
+        mse = np.mean(math.pow((label - ypred), 2))
+        return mse
