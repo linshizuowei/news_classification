@@ -4,7 +4,7 @@ import json
 import sys
 
 from .decision_tree import DecisionTreeCartReg
-from ,decision_tree import CartTreeNode
+from .decision_tree import CartTreeNode
 
 
 class GradientBoostingDecisionTree(object):
@@ -17,21 +17,31 @@ class GradientBoostingDecisionTree(object):
         self.leaf_nodes = config.get('leaf_nodes', 8)
         self.learning_rate = config.get('learning_rate', 0.1)
         self.tree_list = []
+        self.Fout = 0
 
     def fit(self, data, label):
-        # build first tree
-        self.build_first_tree(label)
-
-        # build other trees
+        # build tree
         self.build_trees(data, label)
 
     def predict(self):
         pass
 
-    def build_first_tree(self, label):
+
+    def build_trees(self, data, label):
+        # build first tree
         mean = np.mean(label)
+        self.Fout += mean
+        residual = label - self.Fout
         tree = CartTreeNode(mean)
         self.tree_list.append(tree)
 
-    def build_trees(self, data, label):
-        pass
+        # build left trees
+        for i in range(1, self.tree_nums):
+            cartree = DecisionTreeCartReg()
+            cartree.fit(data, residual)
+            pred = cartree.predict(data)
+            self.Fout += pred * self.learning_rate
+            residual = label - self.Fout
+            self.tree_list.append(cartree)
+
+
