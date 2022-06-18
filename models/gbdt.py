@@ -1,7 +1,9 @@
 import numpy as np
 import os
 import json
+import math
 import sys
+from collections import Counter
 
 from .decision_tree import DecisionTreeCartReg
 from .decision_tree import CartTreeNode
@@ -26,7 +28,11 @@ class GradientBoostingDecisionTree(object):
     def predict(self):
         pass
 
+    def build_trees(self, data, label):
+        pass
 
+
+class GradientBoostingDecisionTreeRegressor(GradientBoostingDecisionTree):
     def build_trees(self, data, label):
         # build first tree
         mean = np.mean(label)
@@ -43,5 +49,23 @@ class GradientBoostingDecisionTree(object):
             self.Fout += pred * self.learning_rate
             residual = label - self.Fout
             self.tree_list.append(cartree)
+
+
+class GradientBoostingDecisionTreeClassifier(GradientBoostingDecisionTree):
+    def build_trees(self, data, label):
+        # build first tree
+        cnt = Counter(label)
+        log_odds = math.log2(cnt[1]/cnt[0])
+        pred = 1 / (1 + math.e ** (-1 * log_odds))
+        self.Fout += pred
+        residual = label - self.Fout
+        tree = CartTreeNode(pred)
+        self.tree_list.append(tree)
+
+        # build left trees
+        for i in range(1, self.tree_nums):
+            cartree = DecisionTreeCartReg()
+            cartree.fit(data, residual)
+            pred = cartree.predict(data)
 
 

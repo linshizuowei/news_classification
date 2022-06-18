@@ -502,3 +502,8 @@ class DecisionTreeCartReg(DecisionTree):
         ypred = np.mean(label)
         mse = np.mean(math.pow((label - ypred), 2))
         return mse
+
+
+class CartTreeGBClassifier(DecisionTreeCartReg):
+    def predict(self, data):
+        pass
