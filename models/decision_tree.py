@@ -21,10 +21,11 @@ class CartTreeNode(object):
         self.right = None
         self.feature = feature
         self.cls = None
+        self.level = 0
 
 
 class DecisionTree(object):
-    def __init__(self):
+    def __init__(self, config):
         self.feature_map = {}
         self.root = TreeNode()
 
@@ -289,6 +290,8 @@ class DecisionTreeCartCls(DecisionTree):
     """
 
     """
+    def __init__(self, config):
+        super(DecisionTreeCartCls, self).__init__()
 
     def build_tree(self, parent_node, data, label):
         """
@@ -502,4 +505,49 @@ class DecisionTreeCartReg(DecisionTree):
         ypred = np.mean(label)
         mse = np.mean(math.pow((label - ypred), 2))
         return mse
+
+
+class GBClassifierTree(DecisionTreeCartReg):
+    """
+    """
+    def __init__(self, config):
+        super(GBClassifierTree, self).__init__()
+        self.deepth = config.get('deepth', 3)
+        self.fout = config.get('fout', 0)
+        self.deepth_cnt = 0
+
+    def build_tree(self, parent_node, data, label):
+        """
+
+        Args:
+            parent_node: CartTreeNode
+            data: np.ndarray, shape: [samples, features], train data set.
+            label: np.ndarray, shape: [samples,], label of train data.
+
+        Returns:
+
+        """
+
+        # find split feature
+        feature_name, feature_value = self.search_split_feature(data, label)
+
+        # initialize tree node of feature values
+        lnode = CartTreeNode(feature_value, feature_name)
+        rnode = CartTreeNode(feature=feature_name)
+        parent_node.left = lnode
+        parent_node.right = rnode
+
+        # build tree left and right
+        lchild = parent_node.left
+        lindex = np.squeeze(np.argwhere(data[:, feature_name] == feature_value))
+        ldata = data[lindex]
+        llabel = label[lindex]
+        self.build_tree(lchild, ldata, llabel)
+        rchild = parent_node.right
+        rindex = np.squeeze(np.argwhere(data[:, feature_name] != feature_value))
+        rdata = data[rindex]
+        rlabel = label[rindex]
+        self.build_tree(rchild, rdata, rlabel)
+
+
 
