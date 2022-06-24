@@ -7,6 +7,7 @@ from collections import Counter
 
 from .decision_tree import DecisionTreeCartReg
 from .decision_tree import CartTreeNode
+from .decision_tree import GBClassifierTree
 
 
 class GradientBoostingDecisionTree(object):
@@ -16,7 +17,6 @@ class GradientBoostingDecisionTree(object):
     def __init__(self, config):
         self.tree_nums = config.get('tree_nums', 5)
         self.deepth = config.get('deepth', 3)
-        self.leaf_nodes = config.get('leaf_nodes', 8)
         self.learning_rate = config.get('learning_rate', 0.1)
         self.tree_list = []
         self.Fout = 0
@@ -64,8 +64,9 @@ class GradientBoostingDecisionTreeClassifier(GradientBoostingDecisionTree):
 
         # build left trees
         for i in range(1, self.tree_nums):
-            cartree = DecisionTreeCartReg()
-            cartree.fit(data, residual)
-            pred = cartree.predict(data)
+            tree = GBClassifierTree()
+            tree.fit(data, residual)
+            self.Fout = tree.fout
+            residual = 
 
 

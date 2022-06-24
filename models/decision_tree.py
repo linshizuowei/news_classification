@@ -516,7 +516,7 @@ class GBClassifierTree(DecisionTreeCartReg):
         self.fout = config.get('fout', 0)
         self.deepth_cnt = 0
 
-    def build_tree(self, parent_node, data, label):
+    def build_tree(self, parent_node, data, label, index):
         """
 
         Args:
@@ -527,6 +527,11 @@ class GBClassifierTree(DecisionTreeCartReg):
         Returns:
 
         """
+
+        if self.deepth_cnt > self.deepth:
+            p = np.sum(label[index]) / np.sum(self.fout[index] * (1-self.fout[index]))
+            self.fout[index] += p
+            return
 
         # find split feature
         feature_name, feature_value = self.search_split_feature(data, label)
@@ -540,14 +545,10 @@ class GBClassifierTree(DecisionTreeCartReg):
         # build tree left and right
         lchild = parent_node.left
         lindex = np.squeeze(np.argwhere(data[:, feature_name] == feature_value))
-        ldata = data[lindex]
-        llabel = label[lindex]
-        self.build_tree(lchild, ldata, llabel)
+        self.build_tree(lchild, data, label, lindex)
         rchild = parent_node.right
         rindex = np.squeeze(np.argwhere(data[:, feature_name] != feature_value))
-        rdata = data[rindex]
-        rlabel = label[rindex]
-        self.build_tree(rchild, rdata, rlabel)
+        self.build_tree(rchild, data, label, rindex)
 
 
 
