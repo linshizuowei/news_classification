@@ -14,13 +14,22 @@ class TreeNode(object):
         self.cls = None
 
 
-class CartTreeNode(object):
+class CartTreeNodeCls(object):
     def __init__(self, val=None, feature=None):
         self.val = val
         self.left = None
         self.right = None
         self.feature = feature
         self.cls = None
+        self.level = 0
+
+class CartTreeNodeReg(object):
+    def __init__(self, val=None, feature=None):
+        self.val = val
+        self.left = None
+        self.right = None
+        self.feature = feature
+        self.score = None
         self.level = 0
 
 
@@ -314,8 +323,8 @@ class DecisionTreeCartCls(DecisionTree):
         feature_name, feature_value = self.search_split_feature(data, label)
 
         # initialize tree node of feature values
-        lnode = CartTreeNode(feature_value, feature_name)
-        rnode = CartTreeNode(feature=feature_name)
+        lnode = CartTreeNodeCls(feature_value, feature_name)
+        rnode = CartTreeNodeCls(feature=feature_name)
         parent_node.left = lnode
         parent_node.right = rnode
 
@@ -404,6 +413,10 @@ class DecisionTreeCartReg(DecisionTree):
 
     """
 
+    def __init__(self, mse_threshold):
+        super(DecisionTreeCartReg, self).__init__()
+        self.mse_threshold = mse_threshold
+
     def build_tree(self, parent_node, data, label):
         """
 
@@ -417,16 +430,17 @@ class DecisionTreeCartReg(DecisionTree):
         """
 
         # stop split node or not
-        if len(set(label)) == 1:
-            parent_node.cls = set(label).pop()
+        mse = self.cal_mse(label)
+        if mse <= self.mse_threshold:
+            parent_node.score = np.mean(label)
             return
 
         # find split feature
         feature_name, feature_value = self.search_split_feature(data, label)
 
         # initialize tree node of feature values
-        lnode = CartTreeNode(feature_value, feature_name)
-        rnode = CartTreeNode(feature=feature_name)
+        lnode = CartTreeNodeReg(feature_value, feature_name)
+        rnode = CartTreeNodeReg(feature=feature_name)
         parent_node.left = lnode
         parent_node.right = rnode
 
@@ -531,14 +545,15 @@ class GBClassifierTree(DecisionTreeCartReg):
         if self.deepth_cnt > self.deepth:
             p = np.sum(label[index]) / np.sum(self.fout[index] * (1-self.fout[index]))
             self.fout[index] += p
+            parent_node.score = p
             return
 
         # find split feature
         feature_name, feature_value = self.search_split_feature(data, label)
 
         # initialize tree node of feature values
-        lnode = CartTreeNode(feature_value, feature_name)
-        rnode = CartTreeNode(feature=feature_name)
+        lnode = CartTreeNodeReg(feature_value, feature_name)
+        rnode = CartTreeNodeReg(feature=feature_name)
         parent_node.left = lnode
         parent_node.right = rnode
 
