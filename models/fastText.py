@@ -3,8 +3,14 @@ import sys
 import json
 
 
-class fastTextModel(object):
+class FastTextModel(object):
     def __init__(self):
+        pass
+
+    def fit(self, data, label):
+        pass
+
+    def predict(self, data):
         pass
 
 
